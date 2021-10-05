@@ -1,0 +1,270 @@
+ 
+Réponse ECF Mahiddine Smail
+
+
+Version	Date	Auteur(s)	Action(s)
+1.0	23/09/21	Rouyer Alexis	Création du document
+
+
+
+Préambule
+Créer et peupler la base de données
+
+Dans un premier temps vous devez installer la base de données dans votre environnement. Sont disponibles un fichier SQL avec la structure de la base ainsi qu’une archive contenant les données de la base sous forme de fichiers CSV.
+2. Analyser la base de données
+2.1 Analyse structurelle
+
+	Une fois la base de données installée et peuplée, vous effectuerez l’analyse structurelle de la base. Sont attendus une description de chaque table (à quoi sert-elle ?) ainsi que les relations entre celles-ci.
+
+Réponse: 
+	
+	la présente base de données est celle d'une entreprise de vente des répliques réduites de models classiques de divers type d’engin ( moto, camion, bus, hélicoptère ....).
+
+Elle est constituée de 8 tables détaillées comme suit : 
+
+1- La table "Customers":  dédiée aux clients, structurée 13 colonnes ou on retrouve toutes les informations des clients ainsi que leurs numéros, noms, prénoms, le contact, adresse, avec une cléf primairee qui est "customerNumber" et une clef étrangére qui est "salesRepEmployeeNumber" .
+
+2- la table "employees": on retrouve dans cette table toutes les infos relatives aux employés, nom, prémno, adresse, etc... on y trouve 8 colonnes avec une clef primaire qui est " 	employeeNumber" et deux clefs étrangéres qui sont " officeCode" et ReoprtTo" 
+3- la table "offices": regrouype tous les bureaux de la société,  constituée de et les détails de leurs implantations ville, état, pays, code postal,téléphone. in trouve juste une clef primaire qui est "officeCode"
+4- la table "orderdetails":  structurée de 5 colonnes, ou on retrouve les détails des ordre d'achat traités; avec le numéro d'ordre, le code produit, la quantité, avec une clef primaire "orderNumber" et une clef étrangére "productCode"… ces informations sont orientées comptabilité ; à contrario de la table ‘’ Ordres ‘’ qui est orientée livraison et stockage… 
+ 
+5- la table "ordres":   résume les ordres d'achat passés  et  et indique les informations comptables de la commande. Elle une clef primaire  ’’ OrderNumber ‘’ 
+
+6- la table "payments":   comme son nom l’indique, elle répertorie   tous les payements en indiquant le numéro client, la date et le montant ; elle a une clef primaire ‘’  checkNumber ‘’
+7- la table "productlines":   résume les 07 types  de produits vendus , on retrouve les distincts type d’engin  avec une description dans la colonne ‘textDescription ‘.. elle a une clef primaire ‘’ prodcutLine’’ .
+
+8- la table "products":  réuni les informations des divers produits disponibles , avec un code ; on retrouve  une productline ainsi que le vendeur ou on peut s’en acquérir , et les stocks disponibles par vendeur et par produit.
+
+
+Les relations entre tables : 
+
+customers.customersName            --------->     payments.customersName
+customers.salesRepEmployees       --------->     employees.employeeNumber
+customers.customerNumber         --------->     orders.customerNumber
+customers.customerNumber         --------->     payments.customerNumber
+orders.orderNumbner                   --------->     orderdetails.orderNumber
+orderdetails.productCode             --------->     products.porductCode
+offices.officeCode                         --------->    employees.officeCode   
+
+
+
+
+ 
+	2.2 Analyse de données
+	
+De quel genre d’entreprises est tirée cette base de données ? Fournissez le dictionnaire de données des tables offices et  customers.
+
+Réponse : 
+	C’est une entreprise de vente de répliques miniatures d’engin de divers types.
+
+Dictionnaires de données: 
+
+table offices
+
+ collonne                                 Type            Null      Valur par défaut  commentaire
+
+officeCOde(primaire)      varchar(10)       Non  
+city                                   varchar(50)      Non  
+phone                                varchar (50)     Non
+adressLine1                       varchar (50)     Non 
+addressLine2                     varchar (50)     Oui   Null
+state                                  varchar (50)     Oui   Null
+country                              varchar (50)     Non
+postalCode                         varchar(15)      Non
+territory                           varchar(10)       Non 
+   
+Index offices   
+Nom index Type   Unique   Compressé    Colonne      Cardinalité  Interclassement Null Commentaire      
+PRIMARY | BTREE  Oui    Non     officeCode     7                 A            Non                     
+
+
+Table customers
+
+collonne                                        Type            Null        Valeur par défaut  commentaire
+
+customerNumber (Primaire)     decimal(11.0)    Non  
+customerName                          varchar(50)      Non  
+contactLastName                      varchar (50)     Non
+contactFirstName                     varchar (50)     Non 
+phone                                         varchar (50)     Null
+addressLine1                             varchar (50)      Null
+addressLine2                             varchar (50)     Oui       Null
+city                                            varchar (50)     Non 
+state                                          varchar (50)     Oui      Null 
+postalCode                                  varchar(15)      Oui      Null
+country                                        varchar(50)     Non 
+salesRepEmployeeNumber           decimal(11.0)   Oui      Null
+creditLimit                                  decimal(10.2)   Oui      NULL 
+   
+Index offices   
+
+Nom index Type   Unique   Compressé    Colonne      Cardinalité  Interclassement Null Commentaire      
+PRIMARY | BTREE  Oui    Non    customerNumber     122                 A       Non                     
+
+salesRepEmployeeNumber
+                BTREE  Non      Non   salesRepEmployeeNumber               A           Oui                          
+                 
+
+
+
+3. Manipulations
+3.1 Interrogations - Requêtes
+Combien y-a-t-il d'enregistrements dans les tables customers,
+ employees, offices, orders, payments et products ?
+Réponse :
+SELECT COUNT(*)  FROM customers ;      // 122  enregistrements 
+SELECT COUNT(*)  FROM employees ;     // 23 enregistrements 
+SELECT COUNT(*)  FROM offices ;            //   7 enregistrements 
+SELECT COUNT(*)  FROM orders ;            // 326 enregistrements 
+SELECT COUNT(*)  FROM payments ;      //273 enregistrements 
+SELECT COUNT(*)  FROM products ;        // 110  enregistrements 
+
+
+Lister par quantité (quantityInStock) décroissante les productName de la table des produits (products) contenant "Harley".
+Réponse :
+
+SELECT productName, quantityInStock 
+FROM products
+ WHERE productName LIKE '%Harley%' 
+ORDER BY quantityInStock DESC;
+
+Lister par le prénom en ordre croissant dans la table des clients (customers) les clients dont le prénom a un a en deuxième position.
+Réponse :
+
+SELECT contactFirstName
+ FROM customers 
+WHERE contactFirstName LIKE '_a%' 
+ORDER BY contactFirstName ASC;
+
+
+Combien y en a-t-il ? 
+Réponse :
+
+ SELECT COUNT(*) FROM customers WHERE contactFirstName LIKE '_a%'; // 33 enregistrements 
+
+
+
+Dans la table products dont nous voulons n'afficher que productName et
+buyPrice sous les dénominations respectives de "Les articles" et "Les prix ; lister les articles dont les prix sont compris entre 50 et 65.
+Réponse :
+SELECT productName AS  'Les articles', buyPrice AS  'Les prix' FROM products WHERE buyPrice BETWEEN 50 AND 65;
+
+
+Afficher la somme, que vous nommerez "Total [07/2004]",  de tous les paiements effectués dans la table payments depuis le 1 juillet 2004.
+Réponse :
+	SELECT SUM(Amount)  AS 'Total [07/2004]' 
+	FROM payments 
+	WHERE paymentDate > '2004-07-01';
+
+
+Sélectionner dans les détails de commande (orderDetails), les commandes dont la quantité est supérieure ou égale à 50 que l'on veut grouper par numéro d'ordre.
+
+Réponse :
+	SELECT * FROM orderDetails 
+	WHERE quantityOrdered >= 50 
+	GROUP BY orderNumber;
+
+Sélectionner les clients (customerName) qui n'ont pas encore passé commande et trier par ordre alphabétique ascendant.
+Réponse : 
+	SELECT C.customerNumber , C.customerName 
+	 FROM customers C
+	LEFT JOIN orders O ON C.customerNumber = O.customerNumber
+	WHERE O.customerNumber IS NULL;
+
+Combien d'employés (Nom, prenom, employeeNumber, jobTitle) ne sont rattachés à aucun bureau (officeCode) ?
+Réponse : 
+	SELECT lastName, firstName, employeeNumber, jobTitle 
+	FROM employees 
+	WHERE officeCode IS NULL;
+
+Combien y-a-t-il de villes différentes dans la table customers ?
+Réponse : 
+	SELECT COUNT(DISTINCT city)
+	 FROM customers;
+
+Quel est le nom et le numéro du client qui a payé le plus dans la table payments. On souhaite avoir la somme totale réellement payée pour chaque client dont on ne veut que le nom (pas le numéro).
+Réponse : 
+
+	SELECT  SUM(Amount), contactLastName
+ 	FROM payments P 
+	INNER JOIN customers C ON P.customerNumber = 	C.customerNumber
+    	GROUP BY customerName
+    	ORDER BY SUM(amount) DESC LIMIT 1;
+
+Dans la table des produits (products), nous voulons la quantité commandée, qui se trouve dans les détails des ordres (orderDetails), totale, et la somme des ventes, depuis le 01/01/2005, classées par ligne de produit (productLine).
+
+Réponse : 
+	SELECT  P.productLine, P.productName,
+    	SUM(quantityOrdered)    AS 'quantitesCommandees',
+    	SUM(quantityOrdered*priceEach) AS 'Somme des ventes'
+    	 FROM orderDetails OD
+    	INNER JOIN orders O ON OD.orderNumber = O.orderNumber
+    	 INNER JOIN products P ON OD.productCode = P.productCode
+    	WHERE O.orderDate > '2005-01-01' 
+	GROUP BY P.productLine
+    	ORDER BY P.productLine;
+          
+
+
+Afficher les identifiants, les dates et statuts des commandes, le nom du client ayant passé commande, ainsi que le nom, le code et la quantité d'articles commandé.
+
+SELECT orderNumber, orderDAte, status 
+FROM orders O
+UNION 
+SELECT productName, P.productCode, quantityOrdered
+FROM products P
+INNER JOIN orderdetails OD ON P.productCode = OD.productCode;
+
+
+
+
+À partir des tables customers, employees, offices, orders, orderDetails, products afficher le nom du client, la ville et le pays du bureau, le prénom, le nom et le poste occupé par l'employé, les articles commandés, leur quantité, la ligne de produit et le prix d'achat.
+
+SELECT  C.customerName, O.city, O.country, E.firstName, E.lastName, E.jobTitle ,
+FROM customers C
+LEFT JOIN employees E ON C.salesRepEmployeeNumber = E.employeeNumber
+LEFT JOIN offices O ON E.officeCode = O.officeCode
+UNION 
+SELECT P.productName, SUM(OD.quantityOrdered), ' ', ' ', P.productLine, P.buyPrice 
+FROM orderDetails OD
+LEFT JOIN orders O  ON OD.orderNumber = O.orderNumber
+LEFT JOIN products P ON OD.productCode = P.productCode
+GROUP BY O.customerNumber;  // ne fonctionne pas !!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+Alexis ROUYER - formateur
+Ludovic DOMENICI – formateur Développement logiciel
+Ch. Perrachon – Ingénieure de formation
+
+Date de mise à jour : 21/01/20
+
+
